@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import Auth from './components/Auth/Auth';
 
-function App() {
-  const [count, setCount] = useState(0)
+function Home() {
+  const [count, setCount] = useState(0);
 
   return (
     <>
@@ -29,7 +31,30 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+function App() {
+  const navigate = useNavigate();
+
+  const handleAuthSuccess = (token: string) => {
+    // Save the token (e.g., in localStorage)
+    localStorage.setItem('authToken', token);
+    navigate('/home');
+  };
+
+  return (
+    <Routes>
+      <Route path="/" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+      <Route path="/home" element={<Home />} />
+    </Routes>
+  );
+}
+
+export default function AppWrapper() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
