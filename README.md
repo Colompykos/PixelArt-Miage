@@ -1,6 +1,6 @@
 # Front-PixelArt-Miage
 
-## Sans Dockirisation
+## Sans Docker
 
 ### Lancer le Frontend
 
@@ -31,7 +31,7 @@
    npm run dev
    ```
 
-## Avec Dockirisation
+## Avec Docker
 
 1. Démarrez les trois services Back/Front/BD :
    ```sh

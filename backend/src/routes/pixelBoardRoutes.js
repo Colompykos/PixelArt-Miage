@@ -1,9 +1,15 @@
 import express from 'express';
-import { createPixelBoard } from '../controllers/PixelBoardController.js';
+import { createPixelBoard, getPixelBoard, addPixel, getAllPixelBoards } from '../controllers/PixelBoardController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/pixelboard', authMiddleware, createPixelBoard);
+router.get('/', getAllPixelBoards);
+
+router.post('/', authMiddleware, createPixelBoard);
+
+router.get('/:id', getPixelBoard);
+
+router.post('/:id/pixels', authMiddleware, addPixel);
 
 export default router;
