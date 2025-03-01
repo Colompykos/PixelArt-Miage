@@ -3,6 +3,7 @@ import Auth from './components/Auth/Auth';
 import Home from './components/Home';
 import CreateBoard from './components/CreateBoard';
 import PixelBoardCanvasWrapper from './components/PixelBoardCanvasWrapper';
+import Profile from './components/Profile/Profile';
 
 function App() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/create-board" element={<CreateBoard />} />
       <Route path="/pixelboard/:id" element={<PixelBoardCanvasWrapper />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="*" element={<div>Page non trouvée</div>} />
     </Routes>
   );

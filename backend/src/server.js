@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import pixelBoardRoutes from './routes/pixelBoardRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 
 dotenv.config();
@@ -24,6 +25,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api/pixelboards', pixelBoardRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
