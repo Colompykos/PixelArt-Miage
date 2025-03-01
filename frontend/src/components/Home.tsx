@@ -33,7 +33,7 @@ const Home: React.FC = () => {
       if (!token) {
         throw new Error('Authentication token not found');
       }
-      
+
       const response = await axios.get<Board[]>(
         'http://localhost:3000/api/pixelboards',
         {
@@ -44,8 +44,8 @@ const Home: React.FC = () => {
     } catch (error: any) {
       console.error('Error loading boards', error);
       setError(
-        error.response?.data?.message || 
-        error.message || 
+        error.response?.data?.message ||
+        error.message ||
         'Failed to load PixelBoards'
       );
     } finally {
@@ -83,10 +83,10 @@ const Home: React.FC = () => {
   const renderBoardThumbnail = (board: Board) => {
     const thumbnailSize = 60;
     const pixelSize = thumbnailSize / Math.max(board.size.width, board.size.height);
-    
+
     return (
-      <div style={{ 
-        width: `${thumbnailSize}px`, 
+      <div style={{
+        width: `${thumbnailSize}px`,
         height: `${thumbnailSize}px`,
         backgroundColor: '#f5f5f5',
         border: '1px solid #ddd',
@@ -94,7 +94,7 @@ const Home: React.FC = () => {
         overflow: 'hidden'
       }}>
         {board.pixels && board.pixels.map((pixel, index) => (
-          <div 
+          <div
             key={index}
             style={{
               position: 'absolute',
@@ -111,9 +111,9 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div style={{ 
-      maxWidth: '1000px', 
-      margin: '0 auto', 
+    <div style={{
+      maxWidth: '1000px',
+      margin: '0 auto',
       padding: '20px',
       fontFamily: 'Arial, sans-serif'
     }}>
@@ -123,8 +123,22 @@ const Home: React.FC = () => {
         alignItems: 'center',
         marginBottom: '20px'
       }}>
+        <button
+          onClick={() => navigate('/profile')}
+          style={{
+            backgroundColor: 'transparent',
+            color: '#666',
+            border: '1px solid #ccc',
+            padding: '10px 20px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            marginRight: '10px'
+          }}
+        >
+          My Profile
+        </button>
         <h1 style={{ color: '#333', margin: 0 }}>My PixelBoards</h1>
-        <button 
+        <button
           onClick={handleCreateBoard}
           style={{
             backgroundColor: '#4CAF50',
@@ -140,28 +154,28 @@ const Home: React.FC = () => {
           Create New Board
         </button>
       </div>
-      
+
       {error && (
-        <div style={{ 
-          backgroundColor: '#ffdddd', 
-          color: '#990000', 
-          padding: '10px', 
+        <div style={{
+          backgroundColor: '#ffdddd',
+          color: '#990000',
+          padding: '10px',
           borderRadius: '5px',
           marginBottom: '15px'
         }}>
           {error}
         </div>
       )}
-      
+
       {loading && !error ? (
         <div style={{ textAlign: 'center', padding: '20px' }}>
           Loading PixelBoards...
         </div>
       ) : (
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-          gap: '20px' 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '20px'
         }}>
           {boards.length > 0 ? (
             boards.map((board) => (
@@ -186,15 +200,15 @@ const Home: React.FC = () => {
                   e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
                 }}
               >
-                <div style={{ 
+                <div style={{
                   display: 'flex',
                   padding: '15px',
                   borderBottom: '1px solid #eee'
                 }}>
                   {renderBoardThumbnail(board)}
                   <div style={{ marginLeft: '15px', flex: 1 }}>
-                    <h2 style={{ 
-                      margin: '0 0 5px 0', 
+                    <h2 style={{
+                      margin: '0 0 5px 0',
                       fontSize: '18px',
                       color: '#333'
                     }}>
@@ -213,23 +227,23 @@ const Home: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div style={{ padding: '15px' }}>
-                  <p style={{ 
+                  <p style={{
                     margin: '0 0 8px 0',
                     color: '#666',
                     fontSize: '14px'
                   }}>
                     <strong>Size:</strong> {board.size.width} × {board.size.height}
                   </p>
-                  <p style={{ 
+                  <p style={{
                     margin: '0 0 8px 0',
                     color: '#666',
                     fontSize: '14px'
                   }}>
-                    <strong>Created:</strong> {new Date(board.creationDate).toLocaleDateString()} 
+                    <strong>Created:</strong> {new Date(board.creationDate).toLocaleDateString()}
                   </p>
-                  <p style={{ 
+                  <p style={{
                     margin: '0',
                     color: '#666',
                     fontSize: '14px',
@@ -241,9 +255,9 @@ const Home: React.FC = () => {
               </div>
             ))
           ) : (
-            <div style={{ 
+            <div style={{
               gridColumn: '1 / -1',
-              textAlign: 'center', 
+              textAlign: 'center',
               padding: '40px 20px',
               backgroundColor: '#f9f9f9',
               borderRadius: '8px',
@@ -255,9 +269,9 @@ const Home: React.FC = () => {
           )}
         </div>
       )}
-      
+
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <button 
+        <button
           onClick={fetchBoards}
           style={{
             backgroundColor: 'transparent',
