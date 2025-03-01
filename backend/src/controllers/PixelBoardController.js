@@ -70,7 +70,24 @@ export const addPixel = async (req, res) => {
     const board = await PixelBoard.findById(req.params.id);
     if (!board) return res.status(404).json({ message: "PixelBoard non trouvé" });
 
+    if (board.status === 'terminée') {
+      return res.status(400).json({ message: "Ce PixelBoard est terminé, vous ne pouvez plus y ajouter de pixels" });
+    }
+    
+    const now = new Date();
+    if (new Date(board.endDate) < now) {
+      board.status = 'terminée';
+      await board.save();
+      return res.status(400).json({ message: "Ce PixelBoard est expiré, vous ne pouvez plus y ajouter de pixels" });
+    }
+
     const { x, y, color } = req.body;
+    const userId = req.user.id;
+    
+    if (x < 0 || x >= board.size.width || y < 0 || y >= board.size.height) {
+      return res.status(400).json({ message: "Coordonnées de pixel invalides" });
+    }
+
     if (board.mode === 'no-overwrite') {
       const pixelExists = board.pixels.some(p => p.x === x && p.y === y);
       if (pixelExists) {
@@ -78,15 +95,38 @@ export const addPixel = async (req, res) => {
       }
     }
 
+    if (board.delay > 0) {
+      const userPixels = board.pixels.filter(p => p.user && p.user.toString() === userId.toString());
+      
+      if (userPixels.length > 0) {
+        userPixels.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        const lastPixelTime = new Date(userPixels[0].timestamp);
+        const currentTime = new Date();
+        
+        const elapsedSeconds = Math.floor((currentTime - lastPixelTime) / 1000);
+        
+        if (elapsedSeconds < board.delay) {
+          const remainingTime = board.delay - elapsedSeconds;
+          return res.status(400).json({ 
+            message: `Vous devez attendre encore ${remainingTime} secondes avant de placer un nouveau pixel` 
+          });
+        }
+      }
+    }
+
     board.pixels.push({
       x,
       y,
       color,
-      user: req.user.id
+      user: userId,
+      timestamp: new Date()
     });
+    
     await board.save();
     res.status(200).json(board);
   } catch (error) {
+    console.error("Error adding pixel:", error);
     res.status(400).json({ error: error.message });
   }
 };

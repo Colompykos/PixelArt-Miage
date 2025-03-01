@@ -31,6 +31,9 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
   const [selectedColor, setSelectedColor] = useState<string>('#000000');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
+  const [cooldownInterval, setCooldownInterval] = useState<NodeJS.Timeout | null>(null);
+
 
   const fetchBoard = async () => {
     try {
@@ -84,7 +87,12 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     fetchBoard();
     const intervalId = setInterval(fetchBoard, 10000);
     
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      if (cooldownInterval) {
+        clearInterval(cooldownInterval);
+      }
+    };
   }, [boardId]);
 
   useEffect(() => {
@@ -130,6 +138,31 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
       console.error('Erreur lors de l\'ajout du pixel:', err);
       if (err.response?.status === 400 && err.response?.data?.message) {
         setError(err.response.data.message);
+        
+        const waitMessage = err.response.data.message;
+        const secondsMatch = waitMessage.match(/attendre encore (\d+) secondes/);
+        if (secondsMatch && secondsMatch[1]) {
+          const seconds = parseInt(secondsMatch[1], 10);
+          setCooldownRemaining(seconds);
+          
+          if (cooldownInterval) {
+            clearInterval(cooldownInterval);
+          }
+
+          const interval = setInterval(() => {
+            setCooldownRemaining(prev => {
+              if (prev !== null && prev > 1) {
+                return prev - 1;
+              } else {
+                clearInterval(interval);
+                setError(null);
+                return null;
+              }
+            });
+          }, 1000);
+          
+          setCooldownInterval(interval);
+        }
       } else if (err.response?.status === 401) {
         setError('Session expirée. Veuillez vous reconnecter.');
       } else {
@@ -159,19 +192,6 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
       fontFamily: 'Arial, sans-serif'
     }}>
       Chargement du PixelBoard...
-    </div>
-  );
-  
-  if (error) return (
-    <div style={{ 
-      backgroundColor: '#ffdddd', 
-      color: '#990000', 
-      padding: '10px', 
-      borderRadius: '5px',
-      marginBottom: '15px',
-      fontFamily: 'Arial, sans-serif'
-    }}>
-      {error}
     </div>
   );
   
@@ -256,22 +276,11 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
               </div>
             </div>
             
-            {error && (
-              <div style={{ 
-                backgroundColor: '#ffdddd', 
-                color: '#990000', 
-                padding: '10px', 
-                borderRadius: '5px',
-                marginBottom: '10px'
-              }}>
-                {error}
-              </div>
-            )}
-            
             <div style={{ 
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
+              position: 'relative'
             }}>
               <canvas
                 ref={canvasRef}
@@ -286,6 +295,34 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
                   boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
                 }}
               />
+              {error && (
+                <div style={{ 
+                  position: 'absolute',
+                  bottom: '10px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: 'rgba(255, 221, 221, 0.9)', 
+                  color: '#990000', 
+                  padding: '10px 15px', 
+                  borderRadius: '5px',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                  maxWidth: '90%',
+                  zIndex: 10,
+                  textAlign: 'center',
+                  fontSize: '14px',
+                  fontWeight: 'bold'
+                }}>
+                  {error}
+                  {cooldownRemaining !== null && (
+                    <div style={{
+                      marginTop: '5px',
+                      fontSize: '16px'
+                    }}>
+                      Temps restant : {cooldownRemaining} secondes
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           
