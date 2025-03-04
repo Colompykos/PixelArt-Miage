@@ -13,7 +13,7 @@ interface UserProfile {
 }
 
 const Profile: React.FC = () => {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [, setProfile] = useState<UserProfile | null>(null);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -80,37 +80,38 @@ const Profile: React.FC = () => {
 
     const handlePasswordChange = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (newPassword !== confirmPassword) {
             toast.error('New passwords do not match');
             return;
         }
-    
+
         if (!currentPassword || !newPassword) {
             toast.error('All password fields are required');
             return;
         }
-    
+
         const token = localStorage.getItem('authToken');
         if (!token) {
             navigate('/');
             return;
         }
-    
+
         try {
-            const response = await axios.put(
+            
+            await axios.put(
                 'http://localhost:3000/api/users/change-password',
                 { currentPassword, newPassword },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-    
+
             toast.success('Password changed successfully! Please login again with your new password.');
-            
+
             setTimeout(() => {
                 localStorage.removeItem('authToken');
                 navigate('/');
             }, 3000);
-            
+
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');

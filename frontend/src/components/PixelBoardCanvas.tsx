@@ -32,8 +32,7 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
-  const [cooldownInterval, setCooldownInterval] = useState<NodeJS.Timeout | null>(null);
-
+  const [cooldownInterval, setCooldownInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   const fetchBoard = async () => {
     try {
