@@ -85,9 +85,24 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
   useEffect(() => {
     fetchBoard();
     const intervalId = setInterval(fetchBoard, 10000);
-    
+
+    const ws = new WebSocket('ws://localhost:3000');
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === 'pixelAdded' && message.boardId === boardId) {
+        setBoard((prevBoard) => {
+          if (!prevBoard) return prevBoard;
+          return {
+            ...prevBoard,
+            pixels: [...prevBoard.pixels, message.pixel],
+          };
+        });
+      }
+    };
+
     return () => {
       clearInterval(intervalId);
+      ws.close();
       if (cooldownInterval) {
         clearInterval(cooldownInterval);
       }
