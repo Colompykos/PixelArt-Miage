@@ -17,9 +17,13 @@ export const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: 'Utilisateur non trouvé' });
     }
     
+    if (!user.isActive) {
+      return res.status(403).json({ message: 'Votre compte a été bloqué' });
+    }
+    
     req.user = {
       id: user._id,
-      role: user.role || 'user'
+      role: user.role
     };
     
     next();
