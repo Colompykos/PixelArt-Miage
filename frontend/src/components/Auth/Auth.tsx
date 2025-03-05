@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './Auth.css';
 
 interface AuthProps {
-  onAuthSuccess: (token: string) => void;
+  onAuthSuccess: (token: string, role: string) => void;
 }
 
 const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
@@ -19,7 +19,7 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const endpoint = isLogin ? '/auth/login' : '/auth/register';
-    
+
     if (!email || !password || (!isLogin && (!firstName || !lastName))) {
       toast.error('All fields are required');
       return;
@@ -41,7 +41,7 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       }
 
       if (isLogin && data.token) {
-        onAuthSuccess(data.token);
+        onAuthSuccess(data.token, data.role || 'user');
         toast.success('Login successful!');
       } else {
         setIsLogin(true);
@@ -57,13 +57,13 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       <ToastContainer />
       <div className="auth-banner">
       </div>
-      
+
       <div className="auth-form-container">
         <h2>{isLogin ? 'Welcome Back' : 'Create an Account'}</h2>
         <p className="subtitle">
           {isLogin ? 'Enter your email and password to access your account' : 'Enter your details to create an account'}
         </p>
-        
+
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <>
@@ -118,7 +118,7 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
               </button>
             </div>
           </div>
-          
+
           <button type="submit" className="submit-button">
             {isLogin ? 'Sign In' : 'Sign Up'}
           </button>

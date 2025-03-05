@@ -6,6 +6,7 @@ import { WebSocketServer } from 'ws';
 import pixelBoardRoutes from './routes/pixelBoardRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use('/auth', authRoutes);
 app.use('/api/pixelboards', pixelBoardRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

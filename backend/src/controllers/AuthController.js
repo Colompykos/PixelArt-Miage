@@ -36,6 +36,10 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
     
+    if (!user.isActive) {
+      return res.status(403).json({ message: "Your account has been blocked. Please contact the administrator." });
+    }
+    
     try {
       const isValidPassword = await user.comparePassword(password);
 
@@ -43,11 +47,16 @@ export const login = async (req, res) => {
         return res.status(401).json({ message: "Invalid email or password" });
       }
       
-      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(
+        { 
+          _id: user._id,
+          role: user.role 
+        }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: "8h" }
+      );
 
-      res.json({ token, userId: user._id });
+      res.json({ token, userId: user._id, role: user.role });
     } catch (passwordError) {
       return res.status(500).json({ message: "Error during authentication" });
     }

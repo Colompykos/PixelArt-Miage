@@ -17,12 +17,17 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+
     if (!token) {
-      navigate('/login');
+      navigate('/');
     }
+
+    setIsAdmin(role === 'admin');
   }, [navigate]);
 
   const fetchBoards = async () => {
@@ -137,6 +142,23 @@ const Home: React.FC = () => {
         >
           My Profile
         </button>
+
+        {isAdmin && (
+          <button
+            onClick={() => navigate('/admin')}
+            style={{
+              backgroundColor: '#673ab7',
+              color: 'white',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginRight: '10px'
+            }}
+          >
+            Admin Panel
+          </button>
+        )}
         <h1 style={{ color: '#333', margin: 0 }}>My PixelBoards</h1>
         <button
           onClick={handleCreateBoard}
