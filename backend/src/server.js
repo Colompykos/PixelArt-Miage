@@ -2,10 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { WebSocketServer } from 'ws';
 import pixelBoardRoutes from './routes/pixelBoardRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-
 
 dotenv.config();
 
@@ -31,6 +31,25 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+const wss = new WebSocketServer({ server });
+
+let broadcastFunction;
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
+
+export const broadcast = (data) => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) { // Use readyState directly
+      client.send(JSON.stringify(data));
+    }
+  });
+};

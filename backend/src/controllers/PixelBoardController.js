@@ -1,4 +1,5 @@
 import PixelBoard from '../models/PixelBoard.js';
+import { broadcast } from '../server.js';
 
 export const getAllPixelBoards = async (req, res) => {
   try {
@@ -8,7 +9,6 @@ export const getAllPixelBoards = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 export const createPixelBoard = async (req, res) => {
   try {
@@ -29,7 +29,6 @@ export const createPixelBoard = async (req, res) => {
         typeof delay !== 'number') {
       return res.status(400).json({ message: 'Width, height, and delay must be numbers' });
     }
-
 
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: 'User authentication error' });
@@ -124,6 +123,7 @@ export const addPixel = async (req, res) => {
     });
     
     await board.save();
+    broadcast({ type: 'pixelAdded', boardId: board._id, pixel: { x, y, color, user: userId } });
     res.status(200).json(board);
   } catch (error) {
     console.error("Error adding pixel:", error);
