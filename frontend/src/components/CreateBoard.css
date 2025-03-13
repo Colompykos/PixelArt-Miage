@@ -1,0 +1,221 @@
+/* Conteneur principal prenant toute la taille de l'écran */
+.create-board-container {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    background-color: #2a2a3d;
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+/* Titre */
+.create-board-title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+/* Message d'erreur */
+.create-board-error {
+    background-color: #ffdddd;
+    color: #990000;
+    padding: 10px;
+    border: 4px solid #fff;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0px #000;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Contenu principal : form et preview */
+.create-board-content {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Formulaire */
+.create-board-form {
+    flex: 1 1 300px;
+    background-color: #fff;
+    color: #000;
+    padding: 15px;
+    border: 4px solid #fff;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.create-board-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #333;
+}
+
+.form-group input,
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: 'Press Start 2P', cursive;
+    text-transform: uppercase;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.hint-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: 'Press Start 2P', cursive;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.cancel-button {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Aperçu */
+.preview-container {
+    flex: 1 1 300px;
+}
+
+.preview-card {
+    background-color: #fff;
+    color: #000;
+    padding: 15px;
+    border: 4px solid #fff;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.preview-title {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #333;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.preview-grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.preview-grid {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #ccc;
+    display: grid;
+    background-color: #f9f9f9;
+}
+
+.preview-grid > div {
+    border: 1px solid #eaeaea;
+    width: 100%;
+    height: 100%;
+}
+
+.preview-dimensions {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.preview-settings {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #666;
+}
+
+.preview-settings h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+/* Bouton de rafraîchissement centré */
+.refresh-container {
+    width: 100%;
+    text-align: center;
+}
+
+.refresh-button {
+    background-color: transparent;
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: 'Press Start 2P', cursive;
+    box-shadow: 4px 4px 0px #000;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+/* Messages de chargement et absence de données */
+.loading-message,
+.no-data-message {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.no-data-message {
+    background-color: #2a2a3d;
+    padding: 40px 20px;
+    border-radius: 10px;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+}
