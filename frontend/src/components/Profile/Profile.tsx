@@ -38,7 +38,6 @@ const Profile: React.FC = () => {
                 });
 
                 const userData = response.data as UserProfile;
-
                 setProfile(userData);
                 setFirstName(userData.firstName || '');
                 setLastName(userData.lastName || '');
@@ -57,7 +56,6 @@ const Profile: React.FC = () => {
     const handleProfileUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         const token = localStorage.getItem('authToken');
-
         if (!token) {
             navigate('/');
             return;
@@ -69,7 +67,6 @@ const Profile: React.FC = () => {
                 { firstName, lastName },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
             setProfile(response.data as UserProfile);
             toast.success('Profile updated successfully!');
         } catch (err) {
@@ -98,7 +95,6 @@ const Profile: React.FC = () => {
         }
 
         try {
-            
             await axios.put(
                 'http://localhost:3000/api/users/change-password',
                 { currentPassword, newPassword },
@@ -106,7 +102,6 @@ const Profile: React.FC = () => {
             );
 
             toast.success('Password changed successfully! Please login again with your new password.');
-
             setTimeout(() => {
                 localStorage.removeItem('authToken');
                 navigate('/');
@@ -124,7 +119,7 @@ const Profile: React.FC = () => {
     if (loading) {
         return (
             <div className="profile-container">
-                <div style={{ textAlign: 'center', padding: '50px 0' }}>Loading profile...</div>
+                <div className="loading-message">Loading profile...</div>
             </div>
         );
     }
@@ -135,17 +130,7 @@ const Profile: React.FC = () => {
 
             <div className="profile-header">
                 <h1 className="profile-title">My Profile</h1>
-                <button
-                    onClick={() => navigate('/home')}
-                    style={{
-                        backgroundColor: 'transparent',
-                        color: '#666',
-                        border: '1px solid #ccc',
-                        padding: '8px 16px',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                    }}
-                >
+                <button className="back-button" onClick={() => navigate('/home')}>
                     Back to Home
                 </button>
             </div>
@@ -181,9 +166,9 @@ const Profile: React.FC = () => {
                             type="email"
                             value={email}
                             readOnly
-                            style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                            className="readonly-input"
                         />
-                        <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
+                        <small className="input-hint">
                             Email cannot be changed
                         </small>
                     </div>
