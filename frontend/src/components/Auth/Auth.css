@@ -1,123 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
 .auth-container {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  .auth-banner {
-    flex: 1;
-    background: url('/src/assets/login-banner.jpg') no-repeat center center;
-    background-size: cover;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    border-radius: 20px;
-    font-size: 1.5rem;
-    text-align: center;
-    padding: 2rem;
-    margin: 10px;
-  }
-  
-  .auth-form-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem;
-    max-width: 450px;
-    margin: auto;
-  }
-  
-  h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  
-  .subtitle {
-    font-size: 1rem;
-    color: #666;
-    margin-bottom: 2rem;
-  }
-  
-  .form-group {
-    width: 100%;
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-group label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-    box-sizing: border-box; 
-    padding-right: 50px;
-  }
-  
-  .password-input {
-    display: flex;
-    align-items: center;
-    position: relative;
-  }
-  
-  .password-input input {
-    flex: 1;
-    box-sizing: border-box; 
-  }
-  
-  .password-toggle {
-    top: 3px;
-    position: absolute;
-    right: -2px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #666;
-  }
-  
-  .error-message {
-    color: red;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
-  
-  .submit-button {
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: white;
-    background-color: black;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  
-  .submit-button:hover {
-    background-color: #333;
-  }
-  
-  .switch-mode {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-  }
-  
-  .switch-button {
-    background: none;
-    border: none;
-    color: black;
-    font-weight: bold;
-    cursor: pointer;
-  }
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+
+.auth-banner {
+  flex: 1;
+  background: url('/src/assets/login-banner.jpg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 20px;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 2rem;
+  margin: 10px;
+}
+
+/* Pixelisation */
+.auth-form-container {
+  flex: 1;
+  background-color: #2a2a3d;
+  padding: 20px;
+  border: 4px solid #ffffff;
+  border-radius:10px;
+  box-shadow: 8px 8px 0px #000000;
+  text-align: center;
+  max-width: 400px;
+  font-family: 'Press Start 2P', cursive;
+}
+
+
+.auth-form-container h2 {
+  font-size: 18px;
+  color: #fff;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+
+.auth-form-container .subtitle {
+  font-size: 10px;
+  color: #aaa;
+  margin-bottom: 20px;
+}
+
+.auth-form-container .form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.auth-form-container .form-group label {
+  display: block;
+  font-size: 12px;
+  color: #fff;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.auth-form-container .form-group input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 0px; /* Suppression des arrondis */
+  font-family: 'Press Start 2P', cursive;
+  text-transform: uppercase;
+  box-shadow: inset 3px 3px 0px #888;
+}
+
+.auth-form-container .password-input {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.auth-form-container .password-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+}
+
+.auth-form-container .submit-button {
+  background-color: #ffcc00;
+  color: #000;
+  border: 2px solid #000;
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: 'Press Start 2P', cursive;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.auth-form-container .submit-button:hover {
+  background-color: #ffaa00;
+}
+
+.auth-form-container .switch-mode {
+  margin-top: 10px;
+  font-size: 10px;
+  color: #fff;
+}
+
+.auth-form-container .switch-button {
+  background: none;
+  border: none;
+  color: #ffcc00;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', cursive;
+}
