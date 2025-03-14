@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Home.css';
 
 interface Board {
@@ -18,25 +19,14 @@ const Home: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const [isAdmin, setIsAdmin] = useState(false);
-
-    useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        const role = localStorage.getItem('userRole');
-
-        if (!token) {
-            navigate('/');
-        }
-
-        setIsAdmin(role === 'admin');
-    }, [navigate]);
+    const { isAdmin, isAuthenticated } = useAuth();
 
     const fetchBoards = async () => {
         setLoading(true);
         setError(null);
         try {
             const token = localStorage.getItem('authToken');
-            if (!token) {
+            if (!token || !isAuthenticated) {
                 throw new Error('Authentication token not found');
             }
             const response = await axios.get<Board[]>(

@@ -1,0 +1,72 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 2rem;
+  background-color: #111122;
+  color: white;
+  font-family: "Press Start 2P", cursive;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  font-size: 1rem;
+  color: #ffcc00;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-item {
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.3s;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.navbar-item:hover {
+  color: #ffcc00;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-logout {
+  color: #ff6b6b;
+}
+
+.navbar-logout:hover {
+  color: #ff0000;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.5rem 1rem;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .navbar-menu {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbar-item {
+    font-size: 0.7rem;
+    padding: 6px 8px;
+  }
+}

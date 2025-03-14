@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import './PixelBoardCanvas.css';
 
 interface Pixel {
@@ -28,6 +29,7 @@ interface PixelBoardCanvasProps {
 }
 
 const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
+  const { isAuthenticated } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [board, setBoard] = useState<PixelBoard | null>(null);
@@ -252,7 +254,7 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
   }, [board]);
 
   const handleCanvasClick = async (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!board || !canvasRef.current) return;
+    if (!board || !canvasRef.current || !isAuthenticated) return;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Profile.css';
 import { ToastContainer, toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface UserProfile {
@@ -14,6 +15,8 @@ interface UserProfile {
 
 const Profile: React.FC = () => {
     const [, setProfile] = useState<UserProfile | null>(null);
+    const { logout } = useAuth();
+    const navigate = useNavigate();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -22,7 +25,6 @@ const Profile: React.FC = () => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('authToken');
@@ -38,6 +40,7 @@ const Profile: React.FC = () => {
                 });
 
                 const userData = response.data as UserProfile;
+
                 setProfile(userData);
                 setFirstName(userData.firstName || '');
                 setLastName(userData.lastName || '');
@@ -103,9 +106,9 @@ const Profile: React.FC = () => {
 
             toast.success('Password changed successfully! Please login again with your new password.');
             setTimeout(() => {
-                localStorage.removeItem('authToken');
+                logout();
                 navigate('/');
-            }, 3000);
+              }, 3000);
 
             setCurrentPassword('');
             setNewPassword('');
