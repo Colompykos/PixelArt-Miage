@@ -19,6 +19,7 @@ interface PixelBoard {
   size: { width: number; height: number };
   author: string;
   mode: string;
+  exportable: boolean;
   pixels: Pixel[];
 }
 
@@ -123,6 +124,53 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     const canvasHeight = board.size.height * PIXEL_SIZE + GRID_LINE_WIDTH;
     canvas.style.width = `${canvasWidth}px`;
     canvas.style.height = `${canvasHeight}px`;
+  };
+
+  const exportAsSVG = (board: PixelBoard, pixelSize: number) => {
+    if (!board) return;
+    
+    const width = board.size.width * pixelSize;
+    const height = board.size.height * pixelSize;
+    
+    let svgContent = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${width}" height="${height}" fill="white"/>`;
+    
+    board.pixels.forEach(pixel => {
+      svgContent += `<rect x="${pixel.x * pixelSize}" y="${pixel.y * pixelSize}" width="${pixelSize}" height="${pixelSize}" fill="${pixel.color}"/>`;
+    });
+    
+    svgContent += '</svg>';
+    
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${board.title.replace(/\s+/g, '-').toLowerCase()}.svg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportAsPNG = (canvas: HTMLCanvasElement, boardTitle: string) => {
+    if (!canvas) return;
+    
+    // Création d'une copie du canvas sans les lignes de grille
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+    
+    // Copie du canvas original
+    tempCtx.drawImage(canvas, 0, 0);
+    
+    const dataUrl = tempCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `${boardTitle.replace(/\s+/g, '-').toLowerCase()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const setupWebSocket = () => {
@@ -334,6 +382,23 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
                 )}
               </div>
             </div>
+
+            {board.exportable && (
+              <div className="export-buttons">
+                <button
+                  onClick={() => exportAsSVG(board, PIXEL_SIZE)}
+                  className="export-button"
+                >
+                  Export as SVG
+                </button>
+                <button
+                  onClick={() => exportAsPNG(canvasRef.current!, board.title)}
+                  className="export-button"
+                >
+                  Export as PNG
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="pixelboard-info-container">
@@ -343,6 +408,7 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
               {board.endDate && <li>Date de fin: {new Date(board.endDate).toLocaleDateString()}</li>}
               <li>Mode: {board.mode === 'no-overwrite' ? 'Pas de réécriture' : 'Réécriture autorisée'}</li>
               <li>Nombre total de pixels placés: {board.pixels.length}</li>
+              <li>Export d'image: {board.exportable ? 'Activé' : 'Désactivé'}</li>
               <li>Auteur: {board.author}</li>
             </ul>
           </div>

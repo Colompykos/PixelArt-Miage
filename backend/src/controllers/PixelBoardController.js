@@ -12,7 +12,7 @@ export const getAllPixelBoards = async (req, res) => {
 
 export const createPixelBoard = async (req, res) => {
   try {
-    const { title, size, mode, delay, endDate } = req.body;
+    const { title, size, mode, delay, endDate, exportable } = req.body;
 
     if (!title || 
         !size || 
@@ -40,7 +40,8 @@ export const createPixelBoard = async (req, res) => {
       mode,
       delay,
       endDate,
-      author: req.user.id
+      author: req.user.id,
+      exportable: exportable || false
     };
 
     console.log('Creating board with data:', newBoardData);

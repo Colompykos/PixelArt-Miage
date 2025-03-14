@@ -12,6 +12,7 @@ interface PixelBoard {
   size: { width: number; height: number };
   author: string;
   mode: string;
+  exportable: boolean;
   pixels: {
     x: number;
     y: number;
@@ -28,6 +29,7 @@ const CreateBoard: React.FC = () => {
   const [mode, setMode] = useState<string>('no-overwrite');
   const [delay, setDelay] = useState<number>(0);
   const [endDate, setEndDate] = useState<string>('');
+  const [exportable, setExportable] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewData, setPreviewData] = useState<Array<Array<string>>>([]);
@@ -87,7 +89,8 @@ const CreateBoard: React.FC = () => {
         size: { width, height },
         mode,
         delay,
-        endDate: formattedEndDate.toISOString()
+        endDate: formattedEndDate.toISOString(),
+        exportable
       };
 
       const response = await axios.post<PixelBoard>(
@@ -210,6 +213,21 @@ const CreateBoard: React.FC = () => {
               </div>
 
               <div className="form-group">
+                <label>Enable Image Export</label>
+                <div className="checkbox-group">
+                  <input
+                      type="checkbox"
+                      checked={exportable}
+                      onChange={(e) => setExportable(e.target.checked)}
+                      id="exportable"
+                  />
+                  <label htmlFor="exportable" className="checkbox-label">
+                    Allow users to export this board as SVG/PNG
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group">
                 <label>End date:</label>
                 <input
                     type="date"
@@ -255,6 +273,7 @@ const CreateBoard: React.FC = () => {
                   <li>Mode: {mode === 'no-overwrite' ? 'No overwrite allowed' : 'Overwrite allowed'}</li>
                   <li>Cooldown: {delay > 0 ? `${delay} seconds between pixels` : 'No cooldown'}</li>
                   <li>End date: {new Date(endDate).toLocaleDateString()}</li>
+                  <li>Image export: {exportable ? 'Enabled' : 'Disabled'}</li>
                 </ul>
               </div>
             </div>
