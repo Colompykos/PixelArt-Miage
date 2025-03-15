@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './Profile.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import 'react-toastify/dist/ReactToastify.css';
@@ -77,54 +78,148 @@ const Profile: React.FC = () => {
         }
     };
 
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (newPassword !== confirmPassword) {
+            toast.error('New passwords do not match');
+            return;
+        }
+
+        if (!currentPassword || !newPassword) {
+            toast.error('All password fields are required');
+            return;
+        }
+
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/');
+            return;
+        }
+
+        try {
+            await axios.put(
+                'http://localhost:3000/api/users/change-password',
+                { currentPassword, newPassword },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            toast.success('Password changed successfully! Please login again with your new password.');
+            setTimeout(() => {
+                logout();
+                navigate('/');
+              }, 3000);
+
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (err) {
+            console.error('Failed to change password:', err);
+            toast.error('Failed to change password. Please verify your current password.');
+        }
+    };
+
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <p className="text-lg font-semibold">Loading profile...</p>
+            <div className="profile-container">
+                <div className="loading-message">Loading profile...</div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+        <div className="profile-container">
             <ToastContainer />
-            <h1 className="text-2xl font-bold text-center mb-6">My Profile</h1>
-            {error && <p className="text-red-500 text-center">{error}</p>}
-            
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div>
-                    <label className="block text-gray-700">First Name</label>
-                    <input
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full p-2 border rounded-lg"
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700">Last Name</label>
-                    <input
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="w-full p-2 border rounded-lg"
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700">Email</label>
-                    <input
-                        type="email"
-                        value={email}
-                        readOnly
-                        className="w-full p-2 border rounded-lg bg-gray-100"
-                    />
-                </div>
-                <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700">
-                    Save Changes
+
+            <div className="profile-header">
+                <h1 className="profile-title">My Profile</h1>
+                <button className="back-button" onClick={() => navigate('/home')}>
+                    Back to Home
                 </button>
-            </form>
+            </div>
+
+            {error && <div className="error-message">{error}</div>}
+
+            <div className="profile-card">
+                <h2>Account Information</h2>
+                <form onSubmit={handleProfileUpdate}>
+                    <div className="form-group">
+                        <label>First Name</label>
+                        <input
+                            type="text"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Last Name</label>
+                        <input
+                            type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            value={email}
+                            readOnly
+                            className="readonly-input"
+                        />
+                        <small className="input-hint">
+                            Email cannot be changed
+                        </small>
+                    </div>
+
+                    <button type="submit" className="save-button">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <div className="profile-card">
+                <h2>Change Password</h2>
+                <form onSubmit={handlePasswordChange}>
+                    <div className="form-group">
+                        <label>Current Password</label>
+                        <input
+                            type="password"
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>New Password</label>
+                        <input
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Confirm New Password</label>
+                        <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <button type="submit" className="save-button">
+                        Change Password
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };
