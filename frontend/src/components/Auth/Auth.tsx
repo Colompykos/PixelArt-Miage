@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import './Auth.css';
 
 interface AuthProps {
-  onAuthSuccess: (token: string, role: string) => void;
+  onAuthSuccess: (token: string, role: string, userId: string) => void;
 }
 
 const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
@@ -15,6 +14,7 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +24,8 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       toast.error('All fields are required');
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const response = await fetch(`http://localhost:3000${endpoint}`, {
@@ -41,22 +43,24 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       }
 
       if (isLogin && data.token) {
-        onAuthSuccess(data.token, data.role || 'user');
+        onAuthSuccess(data.token, data.role || 'user', data.userId);
         toast.success('Login successful!');
       } else {
         setIsLogin(true);
+        setEmail('');
+        setPassword('');
         toast.success('Registration successful! Please login.');
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
-      <ToastContainer />
-      <div className="auth-banner">
-      </div>
+      <div className="auth-banner"></div>
 
       <div className="auth-form-container">
         <h2>{isLogin ? 'Welcome Back' : 'Create an Account'}</h2>
@@ -119,8 +123,12 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
             </div>
           </div>
 
-          <button type="submit" className="submit-button">
-            {isLogin ? 'Sign In' : 'Sign Up'}
+          <button type="submit" className="submit-button" disabled={isLoading}>
+            {isLoading ? (
+              isLogin ? 'Signing In...' : 'Signing Up...'
+            ) : (
+              isLogin ? 'Sign In' : 'Sign Up'
+            )}
           </button>
         </form>
 

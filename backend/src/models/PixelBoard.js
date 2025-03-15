@@ -20,7 +20,8 @@ const PixelBoardSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   mode: { type: String, enum: ['overwrite', 'no-overwrite'], default: 'no-overwrite' },
   pixels: [PixelSchema],
-  delay: { type: Number, required: true }
+  delay: { type: Number, required: true },
+  exportable: { type: Boolean, default: false }
 });
 
 export default mongoose.model('PixelBoard', PixelBoardSchema);
