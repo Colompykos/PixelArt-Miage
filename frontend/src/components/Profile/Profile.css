@@ -79,6 +79,10 @@
   color: #333;
 }
 
+.form-group input, .form-group select{
+  width: 95% !important;
+}
+
 .form-group input {
   width: 100%;
   padding: 10px;
@@ -117,7 +121,7 @@
   font-weight: bold;
   text-transform: uppercase;
   font-family: 'Press Start 2P', cursive;
-  width: 100%;
+  width: 98%;
   margin-top: 10px;
 }
 

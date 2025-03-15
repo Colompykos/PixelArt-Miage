@@ -1,227 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './Profile.css';
-import { ToastContainer, toast } from 'react-toastify';
-import { useAuth } from '../../context/AuthContext';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import "./Profile.css";
 
-interface UserProfile {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-}
+const Profile = () => {
+  const [user, setUser] = useState({});
+  const [oldPassword, setOldPassword] = useState("");
+  const newPasswordRef = useRef();
+  const confirmPasswordRef = useRef();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-const Profile: React.FC = () => {
-    const [, setProfile] = useState<UserProfile | null>(null);
-    const { logout } = useAuth();
-    const navigate = useNavigate();
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-
-    useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            navigate('/');
-            return;
-        }
-
-        const fetchUserProfile = async () => {
-            try {
-                const response = await axios.get('http://localhost:3000/api/users/profile', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                const userData = response.data as UserProfile;
-
-                setProfile(userData);
-                setFirstName(userData.firstName || '');
-                setLastName(userData.lastName || '');
-                setEmail(userData.email || '');
-            } catch (err) {
-                console.error('Failed to fetch profile:', err);
-                setError('Failed to load user profile. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserProfile();
-    }, [navigate]);
-
-    const handleProfileUpdate = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            navigate('/');
-            return;
-        }
-
-        try {
-            const response = await axios.put(
-                'http://localhost:3000/api/users/profile',
-                { firstName, lastName },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setProfile(response.data as UserProfile);
-            toast.success('Profile updated successfully!');
-        } catch (err) {
-            console.error('Failed to update profile:', err);
-            toast.error('Failed to update profile. Please try again.');
-        }
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("/api/user/profile", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        setUser(response.data);
+      } catch (err) {
+        setError("Erreur lors du chargement du profil");
+      }
     };
+    fetchUserData();
+  }, []);
 
-    const handlePasswordChange = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+    setLoading(true);
 
-        if (newPassword !== confirmPassword) {
-            toast.error('New passwords do not match');
-            return;
-        }
+    const newPassword = newPasswordRef.current.value;
+    const confirmPassword = confirmPasswordRef.current.value;
 
-        if (!currentPassword || !newPassword) {
-            toast.error('All password fields are required');
-            return;
-        }
-
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            navigate('/');
-            return;
-        }
-
-        try {
-            await axios.put(
-                'http://localhost:3000/api/users/change-password',
-                { currentPassword, newPassword },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            toast.success('Password changed successfully! Please login again with your new password.');
-            setTimeout(() => {
-                logout();
-                navigate('/');
-              }, 3000);
-
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
-        } catch (err) {
-            console.error('Failed to change password:', err);
-            toast.error('Failed to change password. Please verify your current password.');
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="profile-container">
-                <div className="loading-message">Loading profile...</div>
-            </div>
-        );
+    if (newPassword !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
+      setLoading(false);
+      return;
     }
 
-    return (
-        <div className="profile-container">
-            <ToastContainer />
+    try {
+      await axios.post(
+        "/api/user/change-password",
+        { oldPassword, newPassword },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+      setMessage("Mot de passe mis à jour avec succès");
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setError("Session expirée. Veuillez vous reconnecter.");
+      } else {
+        setError("Échec de la mise à jour du mot de passe");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <div className="profile-header">
-                <h1 className="profile-title">My Profile</h1>
-                <button className="back-button" onClick={() => navigate('/home')}>
-                    Back to Home
-                </button>
-            </div>
+  return (
+    <div className="profile-container">
+      <h2>Profil utilisateur</h2>
+      <p><strong>Nom:</strong> {user.name}</p>
+      <p><strong>Email:</strong> {user.email}</p>
 
-            {error && <div className="error-message">{error}</div>}
-
-            <div className="profile-card">
-                <h2>Account Information</h2>
-                <form onSubmit={handleProfileUpdate}>
-                    <div className="form-group">
-                        <label>First Name</label>
-                        <input
-                            type="text"
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Last Name</label>
-                        <input
-                            type="text"
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            readOnly
-                            className="readonly-input"
-                        />
-                        <small className="input-hint">
-                            Email cannot be changed
-                        </small>
-                    </div>
-
-                    <button type="submit" className="save-button">
-                        Save Changes
-                    </button>
-                </form>
-            </div>
-
-            <div className="profile-card">
-                <h2>Change Password</h2>
-                <form onSubmit={handlePasswordChange}>
-                    <div className="form-group">
-                        <label>Current Password</label>
-                        <input
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>New Password</label>
-                        <input
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Confirm New Password</label>
-                        <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <button type="submit" className="save-button">
-                        Change Password
-                    </button>
-                </form>
-            </div>
-        </div>
-    );
+      <h3>Changer de mot de passe</h3>
+      <form onSubmit={handlePasswordChange}>
+        <input
+          type="password"
+          placeholder="Ancien mot de passe"
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Nouveau mot de passe"
+          ref={newPasswordRef}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Confirmer le mot de passe"
+          ref={confirmPasswordRef}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Mise à jour..." : "Mettre à jour"}
+        </button>
+      </form>
+      {message && <p className="success">{message}</p>}
+      {error && <p className="error">{error}</p>}
+    </div>
+  );
 };
 
 export default Profile;
