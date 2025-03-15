@@ -1,7 +1,7 @@
 /* Conteneur principal centré et occupant tout l'écran */
 .pixelboard-container {
-    width: 100vw;
-    min-height: 100vh;
+    width: 99vw;
+    min-height: 98vh;
     margin: 0;
     padding: 20px;
     background-color: #2a2a3d;
