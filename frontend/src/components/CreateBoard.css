@@ -148,8 +148,6 @@
 }
 
 .preview-grid {
-    width: 200px;
-    height: 200px;
     border: 1px solid #ccc;
     display: grid;
     background-color: #f9f9f9;
