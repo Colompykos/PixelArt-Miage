@@ -116,15 +116,14 @@ const CreateBoard: React.FC = () => {
   };
 
   const renderPreview = () => {
-    const gridSize = 200;
+    const cellSize = 4;
+
     return (
         <div
             className="preview-grid"
             style={{
-              width: `${gridSize}px`,
-              height: `${gridSize}px`,
-              gridTemplateColumns: `repeat(${width}, 1fr)`,
-              gridTemplateRows: `repeat(${height}, 1fr)`
+              gridTemplateColumns: `repeat(${width}, ${cellSize}px)`,
+              gridTemplateRows: `repeat(${height}, ${cellSize}px)`
             }}
         >
           {previewData.map((row, y) =>
@@ -212,7 +211,7 @@ const CreateBoard: React.FC = () => {
                 </p>
               </div>
 
-              <div className="form-group">
+
                 <label>Enable Image Export</label>
                 <div className="checkbox-group">
                   <input
@@ -225,7 +224,7 @@ const CreateBoard: React.FC = () => {
                     Allow users to export this board as SVG/PNG
                   </label>
                 </div>
-              </div>
+
 
               <div className="form-group">
                 <label>End date:</label>
