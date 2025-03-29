@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import './PixelBoardCanvas.css';
 import PixelBoardHeatmap from './HeatMap/PixelBoardHeatmap';
+import PixelBoardReplay from './Replay/PixelBoardReplay';
 
 interface Pixel {
   x: number;
@@ -40,7 +41,7 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
   const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
   const [cooldownInterval, setCooldownInterval] = useState<ReturnType<typeof setInterval> | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const [showHeatmap, setShowHeatmap] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'canvas' | 'heatmap' | 'replay'>('canvas');
 
   const PIXEL_SIZE = 20;
   const GRID_LINE_WIDTH = 1;
@@ -246,6 +247,17 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     }
   }, [board]);
 
+  // This new effect handles redrawing when view mode changes to canvas
+  useEffect(() => {
+    if (board && viewMode === 'canvas') {
+      // Use setTimeout to ensure the canvas element is properly mounted before drawing
+      setTimeout(() => {
+        drawBoard();
+        adjustCanvasContainer();
+      }, 0);
+    }
+  }, [viewMode]);
+
   const handleCanvasClick = async (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!board || !canvasRef.current || !isAuthenticated) return;
     const canvas = canvasRef.current;
@@ -311,10 +323,6 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     }
   };
 
-  const handleToggleView = () => {
-    setShowHeatmap(!showHeatmap);
-  };
-
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active':
@@ -363,49 +371,98 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
             </div>
 
             <div className="canvas-view-container">
-              <div 
-                className="canvas-container" 
-                ref={containerRef}
-                style={{ display: showHeatmap ? 'none' : 'block' }}
-              >
-                <div className="canvas-inner">
-                  <canvas
+              {viewMode === 'canvas' && (
+                <div 
+                  className="canvas-container" 
+                  ref={containerRef}
+                >
+                  <div className="canvas-inner">
+                    <canvas
                       ref={canvasRef}
                       onClick={handleCanvasClick}
                       className="pixelboard-canvas"
-                  />
-                  {error && (
+                    />
+                    {error && (
                       <div className="pixelboard-error">
                         {error}
                         {cooldownRemaining !== null && (
-                            <div className="cooldown-timer">
-                              Temps restant : {cooldownRemaining} secondes
-                            </div>
+                          <div className="cooldown-timer">
+                            Temps restant : {cooldownRemaining} secondes
+                          </div>
                         )}
                       </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {showHeatmap && (
+              {viewMode === 'heatmap' && (
                 <div className="heatmap-container-wrapper">
-                  <PixelBoardHeatmap boardId={boardId} isVisible={showHeatmap} />
+                  <PixelBoardHeatmap boardId={boardId} isVisible={viewMode === 'heatmap'} />
+                </div>
+              )}
+
+              {viewMode === 'replay' && (
+                <div className="replay-container-wrapper">
+                  <PixelBoardReplay boardId={boardId} isVisible={viewMode === 'replay'} />
                 </div>
               )}
             </div>
 
-            {board.mode !== 'no-overwrite' && (
-              <div className="view-toggle-container">
-                <button
-                  onClick={handleToggleView}
-                  className="view-toggle-button"
-                >
-                  {showHeatmap ? "Afficher le canvas" : "Afficher la heatmap"}
-                </button>
-              </div>
-            )}
+            <div className="view-toggle-container">
+              {viewMode === 'canvas' && (
+                <>
+                  <button
+                    onClick={() => setViewMode('heatmap')}
+                    className="view-toggle-button"
+                  >
+                    Afficher la heatmap
+                  </button>
+                  <button
+                    onClick={() => setViewMode('replay')}
+                    className="view-toggle-button"
+                  >
+                    Afficher le replay
+                  </button>
+                </>
+              )}
+              
+              {viewMode === 'heatmap' && (
+                <>
+                  <button
+                    onClick={() => setViewMode('canvas')}
+                    className="view-toggle-button"
+                  >
+                    Afficher le canvas
+                  </button>
+                  <button
+                    onClick={() => setViewMode('replay')}
+                    className="view-toggle-button"
+                  >
+                    Afficher le replay
+                  </button>
+                </>
+              )}
+              
+              {viewMode === 'replay' && (
+                <>
+                  <button
+                    onClick={() => setViewMode('canvas')}
+                    className="view-toggle-button"
+                  >
+                    Afficher le canvas
+                  </button>
+                  <button
+                    onClick={() => setViewMode('heatmap')}
+                    className="view-toggle-button"
+                  >
+                    Afficher la heatmap
+                  </button>
+                </>
+              )}
+            </div>
 
-            {board.exportable && !showHeatmap && (
+            {board.exportable && viewMode === 'canvas' && (
               <div className="export-buttons">
                 <button
                   onClick={() => exportAsSVG(board, PIXEL_SIZE)}
