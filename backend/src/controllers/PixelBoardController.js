@@ -12,7 +12,7 @@ export const getAllPixelBoards = async (req, res) => {
 
 export const createPixelBoard = async (req, res) => {
   try {
-    const { title, size, mode, delay, endDate, exportable } = req.body;
+    const { title, size, mode, delay, endDate, exportable, initialPixels } = req.body;
 
     if (!title || 
         !size || 
@@ -30,6 +30,10 @@ export const createPixelBoard = async (req, res) => {
       return res.status(400).json({ message: 'Width, height, and delay must be numbers' });
     }
 
+    if (size.width > 80 || size.height > 80) {
+      return res.status(400).json({ message: 'Maximum board size is 80x80 pixels' });
+    }
+
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: 'User authentication error' });
     }
@@ -41,8 +45,29 @@ export const createPixelBoard = async (req, res) => {
       delay,
       endDate,
       author: req.user.id,
-      exportable: exportable || false
+      exportable: exportable || false,
+      pixels: []
     };
+
+    if (initialPixels && Array.isArray(initialPixels)) {
+      const validPixels = initialPixels.filter(
+        pixel => pixel.x >= 0 && 
+                pixel.x < size.width && 
+                pixel.y >= 0 && 
+                pixel.y < size.height &&
+                typeof pixel.color === 'string'
+      );
+
+      const timestampedPixels = validPixels.map(pixel => ({
+        ...pixel,
+        user: req.user.id,
+        timestamp: new Date()
+      }));
+
+      newBoardData.pixels = timestampedPixels;
+
+      console.log(`Adding ${timestampedPixels.length} initial pixels from uploaded image`);
+    }
 
     console.log('Creating board with data:', newBoardData);
 

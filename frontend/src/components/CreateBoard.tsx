@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './CreateBoard.css';
+import ImageUploader from './ImageUploader/ImageUploader';
 
 interface PixelBoard {
   _id: string;
@@ -22,6 +23,12 @@ interface PixelBoard {
   }[];
 }
 
+interface PixelData {
+  x: number;
+  y: number;
+  color: string;
+}
+
 const CreateBoard: React.FC = () => {
   const [title, setTitle] = useState('');
   const [width, setWidth] = useState<number>(16);
@@ -33,6 +40,7 @@ const CreateBoard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewData, setPreviewData] = useState<Array<Array<string>>>([]);
+  const [initialPixels, setInitialPixels] = useState<PixelData[]>([]);
   const navigate = useNavigate();
 
   const getDefaultEndDate = () => {
@@ -49,7 +57,6 @@ const CreateBoard: React.FC = () => {
       setTimeout(() => navigate('/login'), 2000);
     }
     updatePreviewGrid(16, 16);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   useEffect(() => {
@@ -57,6 +64,20 @@ const CreateBoard: React.FC = () => {
   }, [width, height]);
 
   const updatePreviewGrid = (w: number, h: number) => {
+    if (initialPixels.length > 0) {
+      const newGrid = Array(h).fill(0).map(() => Array(w).fill('#ffffff'));
+      
+      
+      initialPixels.forEach(pixel => {
+        if (pixel.x < w && pixel.y < h) {
+          newGrid[pixel.y][pixel.x] = pixel.color;
+        }
+      });
+      
+      setPreviewData(newGrid);
+      return;
+    }
+    
     const colors = ['#ffffff', '#f0f0f0', '#e0e0e0', '#d0d0d0'];
     const newGrid = [];
     for (let y = 0; y < h; y++) {
@@ -67,6 +88,26 @@ const CreateBoard: React.FC = () => {
       }
       newGrid.push(row);
     }
+    setPreviewData(newGrid);
+  };
+
+  const handleImageConverted = (pixels: PixelData[], width: number, height: number) => {
+    setWidth(width);
+    setHeight(height);
+    setInitialPixels(pixels);
+    
+    updatePreviewGridWithImageData(width, height, pixels);
+  };
+  
+  const updatePreviewGridWithImageData = (w: number, h: number, pixels: PixelData[]) => {
+    const newGrid = Array(h).fill(0).map(() => Array(w).fill('#ffffff'));
+    
+    pixels.forEach(pixel => {
+      if (pixel.x < w && pixel.y < h) {
+        newGrid[pixel.y][pixel.x] = pixel.color;
+      }
+    });
+    
     setPreviewData(newGrid);
   };
 
@@ -90,7 +131,8 @@ const CreateBoard: React.FC = () => {
         mode,
         delay,
         endDate: formattedEndDate.toISOString(),
-        exportable
+        exportable,
+        initialPixels: initialPixels.length > 0 ? initialPixels : undefined
       };
 
       const response = await axios.post<PixelBoard>(
@@ -152,6 +194,11 @@ const CreateBoard: React.FC = () => {
 
         <div className="create-board-content">
           <div className="create-board-form">
+            <ImageUploader 
+              onImageConverted={handleImageConverted} 
+              maxSize={80}
+            />
+            
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>Title:</label>
@@ -169,8 +216,13 @@ const CreateBoard: React.FC = () => {
                   <input
                       type="number"
                       value={width}
-                      onChange={(e) => setWidth(Number(e.target.value))}
-                      min="1" max="100" required
+                      onChange={(e) => {
+                        setWidth(Number(e.target.value));
+                        if (initialPixels.length > 0 && Number(e.target.value) !== width) {
+                          setInitialPixels([]);
+                        }
+                      }}
+                      min="1" max="80" required
                   />
                 </div>
 
@@ -179,8 +231,13 @@ const CreateBoard: React.FC = () => {
                   <input
                       type="number"
                       value={height}
-                      onChange={(e) => setHeight(Number(e.target.value))}
-                      min="1" max="100" required
+                      onChange={(e) => {
+                        setHeight(Number(e.target.value));
+                        if (initialPixels.length > 0 && Number(e.target.value) !== height) {
+                          setInitialPixels([]);
+                        }
+                      }}
+                      min="1" max="80" required
                   />
                 </div>
               </div>
@@ -211,20 +268,17 @@ const CreateBoard: React.FC = () => {
                 </p>
               </div>
 
-
-                <label>Enable Image Export</label>
-                <div className="checkbox-group">
-                  <input
-                      type="checkbox"
-                      checked={exportable}
-                      onChange={(e) => setExportable(e.target.checked)}
-                      id="exportable"
-                  />
-                  <label htmlFor="exportable" className="checkbox-label">
-                    Allow users to export this board as SVG/PNG
-                  </label>
-                </div>
-
+              <div className="checkbox-group">
+                <input
+                    type="checkbox"
+                    checked={exportable}
+                    onChange={(e) => setExportable(e.target.checked)}
+                    id="exportable"
+                />
+                <label htmlFor="exportable" className="checkbox-label">
+                  Allow users to export this board as SVG/PNG
+                </label>
+              </div>
 
               <div className="form-group">
                 <label>End date:</label>
@@ -264,6 +318,11 @@ const CreateBoard: React.FC = () => {
               </div>
               <div className="preview-dimensions">
                 {width} × {height} pixels
+                {initialPixels.length > 0 && (
+                  <div className="hint-text">
+                    Image imported with {initialPixels.length} non-white pixels
+                  </div>
+                )}
               </div>
 
               <div className="preview-settings">
