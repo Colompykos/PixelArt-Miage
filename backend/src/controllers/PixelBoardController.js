@@ -192,3 +192,28 @@ export const getPixelBoardHeatmap = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+export const getPixelBoardHistory = async (req, res) => {
+  try {
+    const board = await PixelBoard.findById(req.params.id);
+    if (!board) return res.status(404).json({ message: "PixelBoard non trouvé" });
+
+    const sortedPixels = [...board.pixels].sort((a, b) => 
+      new Date(a.timestamp) - new Date(b.timestamp)
+    );
+
+    res.status(200).json({ 
+      pixels: sortedPixels.map(pixel => ({
+        x: pixel.x,
+        y: pixel.y,
+        color: pixel.color,
+        user: pixel.user,
+        timestamp: pixel.timestamp
+      })),
+      boardSize: board.size 
+    });
+  } catch (error) {
+    console.error("Error retrieving pixel history:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
