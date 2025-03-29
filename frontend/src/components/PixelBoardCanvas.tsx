@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import './PixelBoardCanvas.css';
+import PixelBoardHeatmap from './HeatMap/PixelBoardHeatmap';
 
 interface Pixel {
   x: number;
@@ -39,8 +40,8 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
   const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
   const [cooldownInterval, setCooldownInterval] = useState<ReturnType<typeof setInterval> | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const [showHeatmap, setShowHeatmap] = useState<boolean>(false);
 
-  // Taille fixe d'un pixel sur le canvas
   const PIXEL_SIZE = 20;
   const GRID_LINE_WIDTH = 1;
 
@@ -64,18 +65,15 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Définition des dimensions du canvas en fonction de la taille du board
     const canvasWidth = board.size.width * PIXEL_SIZE + GRID_LINE_WIDTH;
     const canvasHeight = board.size.height * PIXEL_SIZE + GRID_LINE_WIDTH;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    // Fond blanc
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Dessin des pixels existants
     board.pixels.forEach((pixel) => {
       ctx.fillStyle = pixel.color;
       ctx.fillRect(
@@ -86,7 +84,6 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
       );
     });
 
-    // Dessin de la grille
     ctx.strokeStyle = '#ccc';
     ctx.lineWidth = GRID_LINE_WIDTH;
     for (let i = 0; i <= board.size.width; i++) {
@@ -103,7 +100,6 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     }
   };
 
-  // Dessiner un pixel individuel (pour mise à jour via WebSocket)
   const drawPixel = (pixel: Pixel) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -118,7 +114,6 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     );
   };
 
-  // On conserve la taille native du canvas (pas de redimensionnement)
   const adjustCanvasContainer = () => {
     if (!containerRef.current || !canvasRef.current || !board) return;
     const canvas = canvasRef.current;
@@ -156,14 +151,12 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
   const exportAsPNG = (canvas: HTMLCanvasElement, boardTitle: string) => {
     if (!canvas) return;
     
-    // Création d'une copie du canvas sans les lignes de grille
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
     const tempCtx = tempCanvas.getContext('2d');
     if (!tempCtx) return;
     
-    // Copie du canvas original
     tempCtx.drawImage(canvas, 0, 0);
     
     const dataUrl = tempCanvas.toDataURL('image/png');
@@ -318,6 +311,10 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
     }
   };
 
+  const handleToggleView = () => {
+    setShowHeatmap(!showHeatmap);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active':
@@ -365,27 +362,50 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
               </div>
             </div>
 
-            <div className="canvas-container" ref={containerRef}>
-              <div className="canvas-inner">
-                <canvas
-                    ref={canvasRef}
-                    onClick={handleCanvasClick}
-                    className="pixelboard-canvas"
-                />
-                {error && (
-                    <div className="pixelboard-error">
-                      {error}
-                      {cooldownRemaining !== null && (
-                          <div className="cooldown-timer">
-                            Temps restant : {cooldownRemaining} secondes
-                          </div>
-                      )}
-                    </div>
-                )}
+            <div className="canvas-view-container">
+              <div 
+                className="canvas-container" 
+                ref={containerRef}
+                style={{ display: showHeatmap ? 'none' : 'block' }}
+              >
+                <div className="canvas-inner">
+                  <canvas
+                      ref={canvasRef}
+                      onClick={handleCanvasClick}
+                      className="pixelboard-canvas"
+                  />
+                  {error && (
+                      <div className="pixelboard-error">
+                        {error}
+                        {cooldownRemaining !== null && (
+                            <div className="cooldown-timer">
+                              Temps restant : {cooldownRemaining} secondes
+                            </div>
+                        )}
+                      </div>
+                  )}
+                </div>
               </div>
+
+              {showHeatmap && (
+                <div className="heatmap-container-wrapper">
+                  <PixelBoardHeatmap boardId={boardId} isVisible={showHeatmap} />
+                </div>
+              )}
             </div>
 
-            {board.exportable && (
+            {board.mode !== 'no-overwrite' && (
+              <div className="view-toggle-container">
+                <button
+                  onClick={handleToggleView}
+                  className="view-toggle-button"
+                >
+                  {showHeatmap ? "Afficher le canvas" : "Afficher la heatmap"}
+                </button>
+              </div>
+            )}
+
+            {board.exportable && !showHeatmap && (
               <div className="export-buttons">
                 <button
                   onClick={() => exportAsSVG(board, PIXEL_SIZE)}
