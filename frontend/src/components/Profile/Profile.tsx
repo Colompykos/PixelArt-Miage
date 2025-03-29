@@ -13,6 +13,23 @@ interface UserProfile {
     email: string;
 }
 
+interface BoardData {
+    _id: string;
+    title: string;
+    size: {
+        width: number;
+        height: number;
+    };
+    status: string;
+    creationDate: string;
+    endDate: string;
+}
+
+interface UserContributions {
+    userBoards: BoardData[];
+    totalPixelsPlaced: number;
+}
+
 const Profile: React.FC = () => {
     const [, setProfile] = useState<UserProfile | null>(null);
     const { logout } = useAuth();
@@ -25,6 +42,8 @@ const Profile: React.FC = () => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [contributions, setContributions] = useState<UserContributions | null>(null);
+    const [contributionsLoading, setContributionsLoading] = useState(true);
 
     useEffect(() => {
         const token = localStorage.getItem('authToken');
@@ -53,7 +72,26 @@ const Profile: React.FC = () => {
             }
         };
 
+        const fetchUserContributions = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/api/users/contributions', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                // Type cast the response data to UserContributions
+                const contributionsData = response.data as UserContributions;
+                console.log('Contributions data:', contributionsData);
+                setContributions(contributionsData);
+            } catch (err) {
+                console.error('Failed to fetch contributions:', err);
+                toast.error('Failed to load contribution data');
+            } finally {
+                setContributionsLoading(false);
+            }
+        };
+
         fetchUserProfile();
+        fetchUserContributions();
     }, [navigate]);
 
     const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -108,7 +146,7 @@ const Profile: React.FC = () => {
             setTimeout(() => {
                 logout();
                 navigate('/');
-              }, 3000);
+            }, 3000);
 
             setCurrentPassword('');
             setNewPassword('');
@@ -117,6 +155,11 @@ const Profile: React.FC = () => {
             console.error('Failed to change password:', err);
             toast.error('Failed to change password. Please verify your current password.');
         }
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
     };
 
     if (loading) {
@@ -139,6 +182,57 @@ const Profile: React.FC = () => {
             </div>
 
             {error && <div className="error-message">{error}</div>}
+
+            <div className="profile-card">
+                <h2>My Contributions</h2>
+                {contributionsLoading ? (
+                    <div>Loading contribution data...</div>
+                ) : contributions ? (
+                    <div className="contributions-data">
+                        <div className="contribution-stat">
+                            <strong>Boards Created:</strong> {contributions.userBoards.length}
+                        </div>
+                        <div className="contribution-stat">
+                            <strong>Total Pixels Placed:</strong> {contributions.totalPixelsPlaced}
+                        </div>
+                        {contributions.userBoards.length > 0 && (
+                            <div className="user-boards">
+                                <h3>My Created Boards</h3>
+                                <ul className="boards-list">
+                                    {contributions.userBoards.map((board) => (
+                                        <li key={board._id} className="board-item">
+                                            <div
+                                                onClick={() => navigate(`/pixelboard/${board._id}`)}
+                                                className="board-link"
+                                            >
+                                                <div className="board-title">
+                                                    {board.title || "Unnamed Board"}
+                                                </div>
+                                                <div className="board-dimensions">
+                                                    {board.size?.width || '?'}x{board.size?.height || '?'}
+                                                </div>
+                                                <div className="board-status">
+                                                    Status: <span className={`status-indicator ${board.status?.toLowerCase().replace(' ', '-')}`}>
+                                                        {board.status || "Unknown"}
+                                                    </span>
+                                                </div>
+                                                <div className="board-date">
+                                                    Created: {formatDate(board.creationDate)}
+                                                </div>
+                                                <div className="board-date">
+                                                    Ends: {formatDate(board.endDate)}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div>Failed to load contribution data</div>
+                )}
+            </div>
 
             <div className="profile-card">
                 <h2>Account Information</h2>

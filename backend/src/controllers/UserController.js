@@ -102,3 +102,29 @@ export const changePassword = async (req, res) => {
       res.status(500).json({ message: "Server error: " + error.message });
     }
 };
+
+export const getUserContributions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const userBoards = await PixelBoard.find({ author: userId });
+    
+    const allBoards = await PixelBoard.find();
+    let totalPixelsPlaced = 0;
+    
+    allBoards.forEach(board => {
+      const userPixels = board.pixels.filter(pixel => 
+        pixel.user && pixel.user.toString() === userId.toString()
+      );
+      totalPixelsPlaced += userPixels.length;
+    });
+    
+    res.status(200).json({
+      userBoards,
+      totalPixelsPlaced
+    });
+  } catch (error) {
+    console.error("Error getting user contributions:", error);
+    res.status(500).json({ message: "Server error: " + error.message });
+  }
+};
