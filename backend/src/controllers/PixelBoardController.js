@@ -156,3 +156,39 @@ export const addPixel = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+export const getPixelBoardHeatmap = async (req, res) => {
+  try {
+    const board = await PixelBoard.findById(req.params.id);
+    if (!board) return res.status(404).json({ message: "PixelBoard non trouvé" });
+
+    const heatmapData = Array(board.size.height).fill().map(() => 
+      Array(board.size.width).fill(0)
+    );
+
+    board.pixels.forEach(pixel => {
+      if (pixel.x >= 0 && pixel.x < board.size.width && 
+          pixel.y >= 0 && pixel.y < board.size.height) {
+        heatmapData[pixel.y][pixel.x]++;
+      }
+    });
+
+    let maxValue = 0;
+    for (let y = 0; y < board.size.height; y++) {
+      for (let x = 0; x < board.size.width; x++) {
+        if (heatmapData[y][x] > maxValue) {
+          maxValue = heatmapData[y][x];
+        }
+      }
+    }
+
+    res.status(200).json({ 
+      heatmapData, 
+      maxValue,
+      boardSize: board.size 
+    });
+  } catch (error) {
+    console.error("Error generating heatmap:", error);
+    res.status(400).json({ error: error.message });
+  }
+};

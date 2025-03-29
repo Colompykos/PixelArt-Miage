@@ -229,3 +229,45 @@
     transform: translateY(0);
     box-shadow: 2px 2px 0 #000;
 }
+
+.view-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  
+  .view-toggle-button {
+    background-color: #673ab7;
+    color: white;
+    border: 2px solid white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+    box-shadow: 4px 4px 0px #000;
+    font-size: 12px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+  }
+  
+  .view-toggle-button:hover {
+    background-color: #5e35b1;
+    transform: translateY(-2px);
+  }
+  
+  .view-toggle-button:active {
+    transform: translateY(0);
+    box-shadow: 2px 2px 0px #000;
+  }
+
+  .canvas-view-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .heatmap-container-wrapper {
+    width: 100%;
+  }
