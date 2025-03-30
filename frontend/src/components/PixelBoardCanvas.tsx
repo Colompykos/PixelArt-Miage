@@ -224,12 +224,10 @@ const PixelBoardCanvas: React.FC<PixelBoardCanvasProps> = ({ boardId }) => {
 
   useEffect(() => {
     fetchBoard();
-    const intervalId = setInterval(fetchBoard, 10000);
     const ws = setupWebSocket();
     const handleResize = () => adjustCanvasContainer();
     window.addEventListener('resize', handleResize);
     return () => {
-      clearInterval(intervalId);
       if (ws) {
         ws.close();
       }
