@@ -201,3 +201,130 @@
     text-transform: uppercase;
     box-shadow: 4px 4px 0px #000;
 }
+
+.filter-sort-container {
+    width: 95%;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 4px solid #fff;
+    border-radius: 10px;
+    box-shadow: 8px 8px 0px #000;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #3a3a5d;
+}
+
+@media (max-width: 768px) {
+    .filter-sort-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .filter-sort-container > div {
+        width: 100%;
+    }
+}
+
+.search-container {
+    flex: 1;
+    min-width: 200px;
+    margin-right: 15px;
+}
+
+.search-input {
+    width: 90%;
+    padding: 10px;
+    border: 3px solid #fff;
+    background-color: #2a2a3d;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.filter-status-container {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    flex: 0 0 auto;
+}
+
+.filter-status-container label {
+    color: #fff;
+    margin-right: 10px;
+    font-size: 12px;
+}
+
+.status-filter {
+    padding: 8px;
+    border: 3px solid #fff;
+    background-color: #2a2a3d;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.sort-container span {
+    color: #fff;
+    margin-right: 10px;
+    font-size: 12px;
+}
+
+.sort-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.sort-button {
+    background-color: #2a2a3d;
+    color: #fff;
+    border: 2px solid #fff;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+    text-transform: uppercase;
+    box-shadow: 2px 2px 0px #000;
+    transition: all 0.2s;
+}
+
+.sort-button:hover {
+    background-color: #3a3a5d;
+}
+
+.sort-button.active {
+    background-color: #ffcc00;
+    color: #000;
+    border-color: #000;
+}
+
+.boards-count {
+    width: 95%;
+    margin-bottom: 15px;
+    text-align: right;
+    color: #ffcc00;
+    font-size: 14px;
+}
+
+.no-boards {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 0px;
+    background-color: #2a2a3d;
+    border: 4px solid #fff;
+    border-radius: 10px;
+    box-shadow: 8px 8px 0px #000;
+    color: #fff;
+    width: 100%;
+}
