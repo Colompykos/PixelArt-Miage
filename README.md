@@ -5,9 +5,9 @@
 - [Lancement de toute l'application en local avec Docker](#lancement-de-toute-lapplication-en-local-avec-docker)
 - [Fonctionnalités générales](#-fonctionnalités-générales)
 - [Bonus implémentés](#-bonus-implémentés)
-- [Remarque : Ajouter un compte admin](#️-remarque--ajouter-un-compte-admin)
+- [Remarque : Ajouter un compte admin](#ℹ️-remarque--ajouter-un-compte-admin)
 - [Déploiement](#déploiement)
-- [Contributions](#contributions)
+- [Contributions](#-contributions)
 
 ---
 
